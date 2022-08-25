@@ -1,4 +1,4 @@
-import AnimatedPhotoView, { HTMLElementAnimationTarget, AnimatedPhotoViewController } from './AnimatedPhotoView'
+import AnimatedPhotoView, { AnimatedPhotoViewController, HTMLElementAnimationTarget } from './AnimatedPhotoView'
 
 export default AnimatedPhotoView
-export { AnimatedPhotoViewController, HTMLElementAnimationTarget as AnimateFromReferenceInstance }
+export { AnimatedPhotoViewController, HTMLElementAnimationTarget }

@@ -62,7 +62,7 @@ interface PhotoViewControls {
 
 type ImageSource = string | HTMLImageElement
 class ImageSourceResolver {
-    source: ImageSource
+    private source: ImageSource
     constructor(source: ImageSource) {
         this.source = source
     }
@@ -86,8 +86,10 @@ class ImageSourceResolver {
 }
 
 export class AnimatedPhotoViewController {
-    _openView: OpenView
-    _closeView: closeView
+    private _openView: OpenView
+    private _closeView: closeView
+    source: ImageSourceResolver
+    animationTarget: AnimationTarget
     setControls(photoViewControls: PhotoViewControls) {
         // Controls:
         // {
@@ -106,6 +108,10 @@ export class AnimatedPhotoViewController {
         if (animationTarget === undefined && _source.isElement) animationTarget = _source.image
         if (!animationTarget) animationTarget = new CustomAnimationTarget(window.innerWidth / 2, window.innerHeight / 2, 10, 10)
         this._openView(_source, animationTarget);
+    }
+
+    closeView(animateTo?: AnimationTarget) {
+        this._closeView(animateTo)
     }
 }
 
@@ -142,13 +148,19 @@ function useUpdate() {
 
 interface PhotoViewContextValue {
     controller: AnimatedPhotoViewController
-    source: ImageSourceResolver
-    animationTarget: AnimationTarget
 }
 
-const PhotoViewContext = React.createContext<PhotoViewContextValue>(null)
+export const PhotoViewContext = React.createContext<PhotoViewContextValue>(null)
+export function usePhotoViewController() {
+    const ctx = React.useContext(PhotoViewContext)
+    return ctx.controller
+}
 
-export default function AnimatedPhotoView({ controller, children }: { controller: AnimatedPhotoViewController, children: any }) {
+export interface AnimatedPhotoViewProps {
+    controller: AnimatedPhotoViewController,
+    children: React.ReactNode | React.ReactNode[] | null,
+}
+export default function AnimatedPhotoView({ controller, children }: AnimatedPhotoViewProps) {
     // Is image visible? Is true even when opening and closing
     const [visible, setVisible] = useState(false)
     // Is animating the opening
@@ -175,6 +187,11 @@ export default function AnimatedPhotoView({ controller, children }: { controller
     useEffect(() => {
         controller.setControls({ openView, closeView })
     }, [controller])
+
+    controller.animationTarget = animationTarget
+    controller.source = source
+
+    if (!visible) return null;
 
     function openView(source: ImageSourceResolver, animationTarget: AnimationTarget) {
         if (animating) return
@@ -284,14 +301,13 @@ export default function AnimatedPhotoView({ controller, children }: { controller
         <div style={bgStyle as any}></div>
         <div style={style}>
             <img
-                src="https://cdn.pixabay.com/photo/2022/05/09/11/20/flower-7184366_960_720.jpg"
+                src={source.url}
                 ref={image}
-                onClick={closeView}
                 style={imageStyle}
             />
         </div>
         <div style={uiStyle}>
-            <PhotoViewContext.Provider value={{ controller, source, animationTarget }}>
+            <PhotoViewContext.Provider value={{ controller }}>
                 {children}
             </PhotoViewContext.Provider>
         </div>
