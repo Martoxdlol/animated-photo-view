@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "noImplicitAny": true,
+        "target": "ES5",
+        "downlevelIteration": true,
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
+        "declaration": true,
+        "declarationMap": true,
+        "declarationDir": "dist",
+        "rootDir": "src",
+        "outDir": "dist",
+        "jsx": "react-jsx"
+    },
+    "include": [
+        "src"
+    ]
+}
